@@ -129,10 +129,6 @@ func (m *Middleware) ServeHTTP(rw http.ResponseWriter, r *http.Request, next htt
 
 	entry = m.Before(entry, r, remoteAddr)
 
-	if m.logStarting {
-		entry.Info("started handling request")
-	}
-
 	next(rw, r)
 
 	latency := m.clock.Since(start)
@@ -151,7 +147,11 @@ type AfterFunc func(*logrus.Entry, negroni.ResponseWriter, time.Duration, string
 
 // DefaultBefore is the default func assigned to *Middleware.Before
 func DefaultBefore(entry *logrus.Entry, req *http.Request, remoteAddr string) *logrus.Entry {
-	return nil
+	return entry.WithFields(logrus.Fields{
+		"request": req.RequestURI,
+		"method":  req.Method,
+		"remote":  remoteAddr,
+	})
 }
 
 // DefaultAfter is the default func assigned to *Middleware.After
