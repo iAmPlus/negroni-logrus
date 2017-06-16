@@ -120,8 +120,6 @@ func (m *Middleware) ServeHTTP(rw http.ResponseWriter, r *http.Request, next htt
 		entry = entry.WithField("request_id", reqID)
 	}
 
-	next(rw, r)
-
 	latency := m.clock.Since(start)
 	res := rw.(negroni.ResponseWriter)
 
